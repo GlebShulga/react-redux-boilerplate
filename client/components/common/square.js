@@ -1,22 +1,38 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { randomSquare } from '../../redux/reducers/createSquare'
 
 import Head from '../head'
 
 const Square = () => {
+  const dispatch = useDispatch()
   const generatedSquare = useSelector((s) => s.create.list)
   const rowsNumber = useSelector((s) => s.create.rows)
   const colsNumber = useSelector((s) => s.create.cols)
   return (
     <div>
       <Head title="Game" />
-      <div
-        className={`grid grid-rows-${rowsNumber} grid-cols-${colsNumber} gap-10 flex justify-items-center`}
-        id="square"
-      >
-        {generatedSquare.map((it, index) => {
-          return <div className="w-20 h-20 bg-gray-500 my-5" key={index} />
-        })}
+      <div className="mx-auto flex flex-wrap justify-center">
+        <div className={`grid grid-rows-${rowsNumber} grid-cols-${colsNumber} gap-10`} id="square">
+          {generatedSquare.map((it, index) => {
+            let color = 'bg-gray-500'
+            if (it === 1) {
+              color = 'bg-yellow-500'
+            }
+            return (
+              <div className={`w-20 h-20 ${color} my-5`} key={index}>
+                {it}
+              </div>
+            )
+          })}
+          <button
+            type="button"
+            className="border rounded bg-teal-300 py-1 px-2"
+            onClick={() => dispatch(randomSquare())}
+          >
+            Random
+          </button>
+        </div>
       </div>
     </div>
   )
