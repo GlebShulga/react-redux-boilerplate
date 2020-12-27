@@ -2,6 +2,8 @@ const CREATE_SQUARE = 'CREATE_SQUARE'
 const GENERATE = 'GENERATE'
 const RANDOM_NUMBER_ADD = 'RANDOM_NUMBER_ADD'
 const UPDATE_FIELD = 'UPDATE_FILED'
+const MAKE_GREEN = 'MAKE_GREEN'
+const MAKE_RED = 'MAKE_RED'
 
 const initialState = {
   list: [],
@@ -34,6 +36,18 @@ export default (state = initialState, action) => {
       return {
         ...state,
         list: action.newArray
+      }
+    }
+    case MAKE_GREEN: {
+      return {
+        ...state,
+        list: action.newArrayGreen
+      }
+    }
+    case MAKE_RED: {
+      return {
+        ...state,
+        list: action.newArrayRed
       }
     }
     default:
@@ -78,5 +92,25 @@ export function randomSquare() {
     dispatch({ type: RANDOM_NUMBER_ADD, number: indexOfList[randomNumber] })
     const newArray = changeValue(list, indexOfList[randomNumber], 1)
     dispatch({ type: UPDATE_FIELD, newArray })
+  }
+}
+
+export function changeGreen() {
+  return (dispatch, getState) => {
+    const store = getState()
+    const { list } = store.create
+    const { activeIndex } = store.create
+    const newArrayGreen = changeValue(list, activeIndex, 2)
+    dispatch({ type: MAKE_GREEN, newArrayGreen })
+  }
+}
+
+export function changeRed() {
+  return (dispatch, getState) => {
+    const store = getState()
+    const { list } = store.create
+    const { activeIndex } = store.create
+    const newArrayRed = changeValue(list, activeIndex, -1)
+    dispatch({ type: MAKE_RED, newArrayRed })
   }
 }
