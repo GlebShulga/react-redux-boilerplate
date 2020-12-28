@@ -6,13 +6,15 @@ const UPDATE_FIELD = 'UPDATE_FILED'
 const MAKE_GREEN = 'MAKE_GREEN'
 const MAKE_RED = 'MAKE_RED'
 const ACTIVE_TIMER = 'ACTIVE_TIMER'
+const SET_GAME_RESULT = 'SET_GAME_RESULT'
 
 const initialState = {
   list: [],
   rows: 0,
   cols: 0,
   activeIndex: null,
-  activeTimer: null
+  activeTimer: null,
+  gameResult: null
 }
 
 export default (state = initialState, action) => {
@@ -59,6 +61,12 @@ export default (state = initialState, action) => {
         activeTimer: action.timer
       }
     }
+    case SET_GAME_RESULT: {
+      return {
+        ...state,
+        gameResult: action.gameResult
+      }
+    }
     default:
       return state
   }
@@ -97,7 +105,7 @@ export function changeRed() {
     const { activeIndex } = store.create
     const newArrayRed = changeValue(list, activeIndex, -1)
     dispatch({ type: MAKE_RED, newArrayRed })
-    randomSquare()
+    dispatch(randomSquare())
   }
 }
 
@@ -108,14 +116,30 @@ export function randomSquare() {
     const indexOfList = list.reduce((acc, rec, index) => {
       return rec === 0 ? [...acc, index] : acc
     }, [])
+    const redCount = list.reduce((acc, rec) => {
+      return rec === -1 ? acc + 1 : acc
+    }, 0)
+    const greenCount = list.reduce((acc, rec) => {
+      return rec === 2 ? acc + 1 : acc
+    }, 0)
+    if (redCount >= list.length / 2) {
+      dispatch({ type: SET_GAME_RESULT, gameResult: 'lose' })
+      clearTimeout(activeTimer)
+      return
+    }
+    if (greenCount >= list.length / 2) {
+      dispatch({ type: SET_GAME_RESULT, gameResult: 'Win' })
+      clearTimeout(activeTimer)
+      return
+    }
     if (indexOfList.length > 0) {
       const randomNumber = Math.floor(Math.random() * indexOfList.length)
       dispatch({ type: RANDOM_NUMBER_ADD, number: indexOfList[randomNumber] })
       const newArray = changeValue(list, indexOfList[randomNumber], 1)
       dispatch({ type: UPDATE_FIELD, newArray })
       const timer = setTimeout(() => {
-        changeRed()
-      }, 2000)
+        dispatch(changeRed())
+      }, 1000)
       dispatch({ type: ACTIVE_TIMER, timer })
     } else {
       clearTimeout(activeTimer)
@@ -126,9 +150,10 @@ export function randomSquare() {
 export function changeGreen() {
   return (dispatch, getState) => {
     const store = getState()
-    const { list } = store.create
-    const { activeIndex } = store.create
+    const { activeIndex, activeTimer, list } = store.create
     const newArrayGreen = changeValue(list, activeIndex, 2)
+    clearTimeout(activeTimer)
     dispatch({ type: MAKE_GREEN, newArrayGreen })
+    dispatch(randomSquare())
   }
 }

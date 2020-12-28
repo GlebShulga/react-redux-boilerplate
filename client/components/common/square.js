@@ -1,17 +1,25 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { randomSquare, changeGreen, changeRed } from '../../redux/reducers/createSquare'
+import { randomSquare, changeGreen } from '../../redux/reducers/createSquare'
+import Result from './result'
 
 import Head from '../head'
 
 const Square = () => {
   const dispatch = useDispatch()
-  const generatedSquare = useSelector((s) => s.create.list)
-  const rowsNumber = useSelector((s) => s.create.rows)
-  const colsNumber = useSelector((s) => s.create.cols)
+
+  const {
+    list: generatedSquare,
+    rows: rowsNumber,
+    cols: colsNumber,
+    activeTimer,
+    activeIndex,
+    gameResult
+  } = useSelector((s) => s.create)
 
   useEffect(() => {
     dispatch(randomSquare())
+    return () => clearTimeout(activeTimer)
   }, [])
 
   return (
@@ -31,25 +39,16 @@ const Square = () => {
               color = 'bg-red-500'
             }
             return (
-              <div className={`w-20 h-20 ${color} my-5`} key={index}>
-                {it}
-              </div>
+              <button
+                type="button"
+                className={`w-20 h-20 ${color} my-5`}
+                key={index}
+                onClick={() => dispatch(changeGreen())}
+                disabled={activeIndex !== index}
+              />
             )
           })}
-          <button
-            type="button"
-            className="border rounded bg-teal-300 py-1 px-2"
-            onClick={() => dispatch(changeGreen())}
-          >
-            Green
-          </button>
-          <button
-            type="button"
-            className="border rounded bg-teal-300 py-1 px-2"
-            onClick={() => dispatch(changeRed())}
-          >
-            Red
-          </button>
+          {gameResult && <div className="absolute w-screen h-screen bg-gray-500 opacity-25"><Result /></div>}
         </div>
       </div>
     </div>
