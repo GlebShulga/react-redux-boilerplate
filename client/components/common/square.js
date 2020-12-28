@@ -11,11 +11,8 @@ const Square = () => {
   const colsNumber = useSelector((s) => s.create.cols)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch(randomSquare())
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [randomSquare()])
+    dispatch(randomSquare())
+  }, [])
 
   return (
     <div>

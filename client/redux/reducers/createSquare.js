@@ -1,15 +1,18 @@
+/* eslint-disable no-use-before-define */
 const CREATE_SQUARE = 'CREATE_SQUARE'
 const GENERATE = 'GENERATE'
 const RANDOM_NUMBER_ADD = 'RANDOM_NUMBER_ADD'
 const UPDATE_FIELD = 'UPDATE_FILED'
 const MAKE_GREEN = 'MAKE_GREEN'
 const MAKE_RED = 'MAKE_RED'
+const ACTIVE_TIMER = 'ACTIVE_TIMER'
 
 const initialState = {
   list: [],
   rows: 0,
   cols: 0,
-  activeIndex: null
+  activeIndex: null,
+  activeTimer: null
 }
 
 export default (state = initialState, action) => {
@@ -50,6 +53,12 @@ export default (state = initialState, action) => {
         list: action.newArrayRed
       }
     }
+    case ACTIVE_TIMER: {
+      return {
+        ...state,
+        activeTimer: action.timer
+      }
+    }
     default:
       return state
   }
@@ -81,17 +90,36 @@ function changeValue(arr, index, newValue) {
   return arr.map((it, ind) => (ind === index ? newValue : it))
 }
 
-export function randomSquare() {
+export function changeRed() {
   return (dispatch, getState) => {
     const store = getState()
     const { list } = store.create
+    const { activeIndex } = store.create
+    const newArrayRed = changeValue(list, activeIndex, -1)
+    dispatch({ type: MAKE_RED, newArrayRed })
+    randomSquare()
+  }
+}
+
+export function randomSquare() {
+  return (dispatch, getState) => {
+    const store = getState()
+    const { activeTimer, list } = store.create
     const indexOfList = list.reduce((acc, rec, index) => {
       return rec === 0 ? [...acc, index] : acc
     }, [])
-    const randomNumber = Math.floor(Math.random() * indexOfList.length)
-    dispatch({ type: RANDOM_NUMBER_ADD, number: indexOfList[randomNumber] })
-    const newArray = changeValue(list, indexOfList[randomNumber], 1)
-    dispatch({ type: UPDATE_FIELD, newArray })
+    if (indexOfList.length > 0) {
+      const randomNumber = Math.floor(Math.random() * indexOfList.length)
+      dispatch({ type: RANDOM_NUMBER_ADD, number: indexOfList[randomNumber] })
+      const newArray = changeValue(list, indexOfList[randomNumber], 1)
+      dispatch({ type: UPDATE_FIELD, newArray })
+      const timer = setTimeout(() => {
+        changeRed()
+      }, 2000)
+      dispatch({ type: ACTIVE_TIMER, timer })
+    } else {
+      clearTimeout(activeTimer)
+    }
   }
 }
 
@@ -102,15 +130,5 @@ export function changeGreen() {
     const { activeIndex } = store.create
     const newArrayGreen = changeValue(list, activeIndex, 2)
     dispatch({ type: MAKE_GREEN, newArrayGreen })
-  }
-}
-
-export function changeRed() {
-  return (dispatch, getState) => {
-    const store = getState()
-    const { list } = store.create
-    const { activeIndex } = store.create
-    const newArrayRed = changeValue(list, activeIndex, -1)
-    dispatch({ type: MAKE_RED, newArrayRed })
   }
 }
