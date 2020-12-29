@@ -48,8 +48,12 @@ const Square = () => {
               />
             )
           })}
-          {gameResult && <div className="absolute w-screen h-screen bg-gray-500 opacity-25"><Result /></div>}
         </div>
+        {gameResult && (
+          <div className="absolute w-screen h-screen bg-gray-700 opacity-80 top-0 left-0 flex items-center justify-center">
+            <Result />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import Head from '../head'
 
@@ -7,10 +8,11 @@ const Result = () => {
   return (
     <div>
       <Head title="Result" />
-      <div className="max-w-2xl bg-white py-10 px-5 m-auto w-full mt-10 flex justify-items-center">
-        <div className="bg-blue-500 w-2/3 hover:text-red-200 text-white font-bold rounded-lg border shadow-lg p-10">
-          {gameResult}
-        </div>
+      <div className="bg-blue-900 text-white font-bold rounded-lg border shadow-lg p-10 grid grid-rows-2 opacity-100">
+        <div className="flex justify-center text-2xl">{gameResult}</div>
+        <Link to="/" className="border rounded bg-teal-300 p-2 hover:text-pink-500">
+          Play again
+        </Link>
       </div>
     </div>
   )
