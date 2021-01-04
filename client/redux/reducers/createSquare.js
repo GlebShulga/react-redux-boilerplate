@@ -1,4 +1,13 @@
 /* eslint-disable no-use-before-define */
+import {
+  GRAY_SQUARE,
+  YELLOW_SQUARE,
+  GREEN_SQUARE,
+  RED_SQUARE,
+  INC_TIMER,
+  DEC_TIMER
+} from '../../constants/constants'
+
 const CREATE_SQUARE = 'CREATE_SQUARE'
 const GENERATE = 'GENERATE'
 const RANDOM_NUMBER_ADD = 'RANDOM_NUMBER_ADD'
@@ -17,7 +26,8 @@ const initialState = {
   activeTimer: null,
   gameResult: null,
   hardMode: false,
-  timeoutValue: 1000
+  timeoutValue: 1000,
+  countObj: { green: 0, red: 0 }
 }
 
 export default (state = initialState, action) => {
@@ -61,7 +71,8 @@ export default (state = initialState, action) => {
     case ACTIVE_TIMER: {
       return {
         ...state,
-        activeTimer: action.timer
+        activeTimer: action.timer,
+        countObj: action.countObj
       }
     }
     case SET_GAME_RESULT: {
@@ -83,11 +94,7 @@ export default (state = initialState, action) => {
 
 export function createSquare(number, axis) {
   return (dispatch) => {
-    if (axis === 'cols' || axis === 'rows') {
-      dispatch({ type: CREATE_SQUARE, axis, number })
-    }
-    if (axis === 'hardMode') {
-      console.log(number)
+    if (axis === 'cols' || axis === 'rows' || axis === 'hardMode') {
       dispatch({ type: CREATE_SQUARE, axis, number })
     }
   }
@@ -96,7 +103,7 @@ export function createSquare(number, axis) {
 export function generate() {
   return (dispatch, getState) => {
     const store = getState()
-    const multiply = new Array(store.create.rows * store.create.cols).fill(0)
+    const multiply = new Array(store.create.rows * store.create.cols).fill(GRAY_SQUARE)
     dispatch({ type: GENERATE, multiply })
   }
 }
@@ -116,9 +123,9 @@ export function changeRed() {
     const store = getState()
     const { list, hardMode, timeoutValue } = store.create
     const { activeIndex } = store.create
-    const newArrayRed = changeValue(list, activeIndex, -1)
+    const newArrayRed = changeValue(list, activeIndex, RED_SQUARE)
     if (hardMode) {
-      const hardModeTimer = timeoutValue * 1.05
+      const hardModeTimer = timeoutValue * INC_TIMER
       dispatch({ type: UPDATE_TIMEOUT_VALUE, hardModeTimer })
     }
     dispatch({ type: MAKE_RED, newArrayRed })
@@ -131,13 +138,13 @@ export function randomSquare() {
     const store = getState()
     const { activeTimer, list, timeoutValue } = store.create
     const indexOfList = list.reduce((acc, rec, index) => {
-      return rec === 0 ? [...acc, index] : acc
+      return rec === GRAY_SQUARE ? [...acc, index] : acc
     }, [])
     const redCount = list.reduce((acc, rec) => {
-      return rec === -1 ? acc + 1 : acc
+      return rec === RED_SQUARE ? acc + 1 : acc
     }, 0)
     const greenCount = list.reduce((acc, rec) => {
-      return rec === 2 ? acc + 1 : acc
+      return rec === GREEN_SQUARE ? acc + 1 : acc
     }, 0)
     if (redCount >= list.length / 2) {
       dispatch({ type: SET_GAME_RESULT, gameResult: 'Lose' })
@@ -152,12 +159,12 @@ export function randomSquare() {
     if (indexOfList.length > 0) {
       const randomNumber = Math.floor(Math.random() * indexOfList.length)
       dispatch({ type: RANDOM_NUMBER_ADD, number: indexOfList[randomNumber] })
-      const newArray = changeValue(list, indexOfList[randomNumber], 1)
+      const newArray = changeValue(list, indexOfList[randomNumber], YELLOW_SQUARE)
       dispatch({ type: UPDATE_FIELD, newArray })
       const timer = setTimeout(() => {
         dispatch(changeRed())
       }, timeoutValue)
-      dispatch({ type: ACTIVE_TIMER, timer })
+      dispatch({ type: ACTIVE_TIMER, timer, countObj: { red: redCount, green: greenCount } })
     } else {
       clearTimeout(activeTimer)
     }
@@ -168,9 +175,9 @@ export function changeGreen() {
   return (dispatch, getState) => {
     const store = getState()
     const { activeIndex, activeTimer, list, hardMode, timeoutValue } = store.create
-    const newArrayGreen = changeValue(list, activeIndex, 2)
+    const newArrayGreen = changeValue(list, activeIndex, GREEN_SQUARE)
     if (hardMode) {
-      const hardModeTimer = (timeoutValue * 95) / 100
+      const hardModeTimer = timeoutValue * DEC_TIMER
       dispatch({ type: UPDATE_TIMEOUT_VALUE, hardModeTimer })
     }
     clearTimeout(activeTimer)
@@ -179,8 +186,8 @@ export function changeGreen() {
   }
 }
 
-// Усложнения
-// Добавить уровень сложности легкий/сложный
-// Если выбран сложный, то при попадании (квадрат зеленый) - время на попадание следующего уменьшается на 5 процентов,
-// а при промахе на 5 процентов время увеличивается. Например при старте игры - у пользователя есть время 1000мс, если он попал,
-// то на нажатие следующего будет 950мс, если еще попал, то 950 - 950 *0.05 и тд, если промахнулся 950 + 950 * 0.05
+export function gameResultToNull() {
+  return (dispatch) => {
+    dispatch({ type: SET_GAME_RESULT, gameResult: null })
+  }
+}

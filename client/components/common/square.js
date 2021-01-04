@@ -4,6 +4,7 @@ import { randomSquare, changeGreen } from '../../redux/reducers/createSquare'
 import Result from './result'
 
 import Head from '../head'
+import { YELLOW_SQUARE, GREEN_SQUARE, RED_SQUARE } from '../../constants/constants'
 
 const Square = () => {
   const dispatch = useDispatch()
@@ -29,13 +30,13 @@ const Square = () => {
         <div className={`grid grid-rows-${rowsNumber} grid-cols-${colsNumber} gap-10`} id="square">
           {generatedSquare.map((it, index) => {
             let color = 'bg-gray-500'
-            if (it === 1) {
+            if (it === YELLOW_SQUARE) {
               color = 'bg-yellow-500'
             }
-            if (it === 2) {
+            if (it === GREEN_SQUARE) {
               color = 'bg-green-500'
             }
-            if (it === -1) {
+            if (it === RED_SQUARE) {
               color = 'bg-red-500'
             }
             return (
