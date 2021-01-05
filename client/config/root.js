@@ -8,11 +8,12 @@ import { Switch, Route, Redirect, StaticRouter } from 'react-router-dom'
 import store, { history } from '../redux'
 
 import Square from '../components/common/square'
-import Home from '../components/home'
-import DummyView from '../components/dummy-view'
+import MainPage from '../components/main-page'
 import NotFound from '../components/404'
 
 import Startup from './startup'
+
+import '../assets/scss/styles.scss'
 
 const OnlyAnonymousRoute = ({ component: Component, ...rest }) => {
   const func = (props) =>
@@ -73,10 +74,9 @@ const RootComponent = (props) => {
       <RouterSelector history={history} location={props.location} context={props.context}>
         <Startup>
           <Switch>
-            <Route exact path="/" component={() => <DummyView />} />
+            <Route exact path="/" component={() => <MainPage />} />
             <Route exact path="/square" component={() => <Square />} />
-            <Route exact path="/dashboard" component={() => <Home />} />
-            <PrivateRoute exact path="/hidden-route" component={() => <DummyView />} />
+            <PrivateRoute exact path="/hidden-route" component={() => <MainPage />} />
             <Route component={() => <NotFound />} />
           </Switch>
         </Startup>

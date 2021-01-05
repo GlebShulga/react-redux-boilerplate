@@ -11,7 +11,7 @@ const Result = () => {
     <div>
       <Head title="Result" />
       <div className="bg-blue-900 text-white font-bold rounded-lg border shadow-lg p-10 grid grid-rows-2 opacity-100">
-        <div className="flex justify-center text-2xl">{gameResult}</div>
+        <div className="flex justify-center text-3xl pb-1">{gameResult}</div>
         <div>
           {gameResult === 'Win'
             ? `Red: ${countObj.red} Green: ${countObj.green + 1}`
@@ -22,7 +22,7 @@ const Result = () => {
           onClick={() => {
             dispatch(gameResultToNull())
           }}
-          className="border rounded bg-teal-300 p-2 hover:text-pink-500"
+          className="border rounded bg-teal-300 p-2 mt-3 hover:text-pink-500 text-center"
         >
           Play again
         </Link>
